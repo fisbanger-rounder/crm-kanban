@@ -410,6 +410,7 @@ const CRMAuth = (() => {
     const name = getUserName();
     const email = getUserEmail();
     const initials = CRMStore.getInitials(name);
+    const color = CRMStore.getAvatarColor(name);
     const avatarUrl = currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture;
 
     const avatarHtml = avatarUrl
