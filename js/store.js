@@ -312,13 +312,30 @@ const CRMStore = (() => {
     return Math.floor((now - entered) / (1000 * 60 * 60 * 24));
   }
 
+  const CURRENCY_KEY = 'crm_kanban_currency';
+
+  function getCurrency() {
+    return localStorage.getItem(CURRENCY_KEY) || 'USD';
+  }
+
+  function setCurrency(currency) {
+    localStorage.setItem(CURRENCY_KEY, currency);
+    emit('currency:changed', currency);
+    emit('deals:changed');
+  }
+
   function formatCurrency(value) {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
+    const currency = getCurrency();
+    try {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currency,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(value);
+    } catch {
+      return '$' + Math.round(value).toLocaleString();
+    }
   }
 
   function getInitials(name) {
@@ -452,6 +469,8 @@ const CRMStore = (() => {
     getStats,
     getTheme,
     setTheme,
+    getCurrency,
+    setCurrency,
     getSidebarState,
     setSidebarState,
     getDaysInStage,

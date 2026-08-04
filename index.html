@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-  <meta name="description" content="Modern CRM Kanban Board — Manage your sales pipeline with drag-and-drop simplicity.">
+  <meta name="description" content="Modern CRM Kanban Board — Manage your sales pipeline, contacts, and analytics.">
   <title>CRM Kanban — Sales Pipeline</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="css/style.css">
@@ -21,7 +21,7 @@
     <!-- Rendered by auth.js -->
   </div>
 
-  <!-- ═══ App Screen (Kanban) ═══ -->
+  <!-- ═══ App Screen (Multi-View Layout) ═══ -->
   <div class="app-layout" id="app-screen">
 
     <!-- ═══ Sidebar ═══ -->
@@ -34,7 +34,7 @@
       <nav class="sidebar-nav">
         <span class="nav-section-label">Main</span>
 
-        <div class="nav-item active" data-view="kanban" id="nav-kanban">
+        <div class="nav-item active" data-view="pipeline" id="nav-pipeline">
           <span class="nav-icon">
             <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>
           </span>
@@ -88,8 +88,8 @@
           <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu">
             <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
           </button>
-          <h1 class="topbar-title">Sales Pipeline</h1>
-          <div class="topbar-stats">
+          <h1 class="topbar-title" id="page-title">Sales Pipeline</h1>
+          <div class="topbar-stats" id="topbar-stats-chips">
             <div class="stat-chip">
               <span>Deals</span>
               <span class="stat-value" id="stat-total-deals">0</span>
@@ -101,11 +101,11 @@
           </div>
         </div>
         <div class="topbar-right">
-          <div class="search-box">
+          <div class="search-box" id="topbar-search-box">
             <span class="search-icon">
               <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </span>
-            <input type="text" id="search-input" placeholder="Search deals..." autocomplete="off">
+            <input type="text" id="search-input" placeholder="Search..." autocomplete="off">
           </div>
           <button class="btn-add-deal" id="btn-add-deal">
             <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -117,9 +117,28 @@
         </div>
       </header>
 
-      <!-- ── Kanban Board ── -->
-      <div class="kanban-board" id="kanban-board">
-        <!-- Columns rendered by JS -->
+      <!-- ── Views Containers ── -->
+      
+      <!-- 1. Pipeline (Kanban) -->
+      <div class="app-view active" id="view-pipeline">
+        <div class="kanban-board" id="kanban-board">
+          <!-- Columns rendered by JS -->
+        </div>
+      </div>
+
+      <!-- 2. Contacts -->
+      <div class="app-view" id="view-contacts">
+        <div id="contacts-container"></div>
+      </div>
+
+      <!-- 3. Analytics -->
+      <div class="app-view" id="view-analytics">
+        <div id="analytics-container"></div>
+      </div>
+
+      <!-- 4. Settings -->
+      <div class="app-view" id="view-settings">
+        <div id="settings-container"></div>
       </div>
 
     </main>
@@ -138,11 +157,14 @@
   <!-- Supabase JS Client (CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
-  <!-- Scripts (order matters: config → store → kanban → modal → auth → app) -->
+  <!-- Scripts (order matters: config → store → kanban → modal → views → auth → app) -->
   <script src="js/config.js"></script>
   <script src="js/store.js"></script>
   <script src="js/kanban.js"></script>
   <script src="js/modal.js"></script>
+  <script src="js/contacts.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/settings.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/app.js"></script>
 
