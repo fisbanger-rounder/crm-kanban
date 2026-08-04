@@ -568,6 +568,125 @@ input, select, textarea {
   gap: 10px;
 }
 
+.column-edit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  opacity: 0;
+  transition: all var(--duration-fast) ease;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.column-header:hover .column-edit-btn {
+  opacity: 1;
+}
+
+.column-edit-btn:hover {
+  background: var(--bg-surface-raised);
+  color: var(--text-primary);
+}
+
+.column-edit-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: currentColor;
+}
+
+/* Add Column Card */
+.add-column-card {
+  background: transparent;
+  border: 2px dashed var(--border-default);
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.add-column-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  padding: 32px;
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.add-column-btn:hover {
+  color: var(--accent-primary);
+  background: var(--accent-primary-soft);
+}
+
+.add-column-btn svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* Color Swatches Palette */
+.color-palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+  position: relative;
+}
+
+.color-swatch:hover {
+  transform: scale(1.15);
+}
+
+.color-swatch.active {
+  border-color: var(--text-primary);
+  box-shadow: 0 0 0 3px var(--accent-primary-soft);
+}
+
+.custom-color-wrapper {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--border-default);
+  cursor: pointer;
+}
+
+.color-input-picker {
+  width: 150%;
+  height: 150%;
+  transform: translate(-15%, -15%);
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
 .column-dot {
   width: 8px;
   height: 8px;

@@ -178,6 +178,7 @@ const AnalyticsView = (() => {
   function bindEvents() {
     CRMStore.on('deals:changed', () => render());
     CRMStore.on('currency:changed', () => render());
+    CRMStore.on('stages:changed', () => render());
   }
 
   function escapeHtml(str) {

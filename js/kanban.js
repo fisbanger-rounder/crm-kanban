@@ -21,10 +21,23 @@ const KanbanBoard = (() => {
     if (!boardEl) return;
     boardEl.innerHTML = '';
 
-    CRMStore.STAGES.forEach(stage => {
+    const stages = CRMStore.getStages();
+    stages.forEach(stage => {
       const col = createColumn(stage);
       boardEl.appendChild(col);
     });
+
+    // "+ Add Column" card at the end of the board
+    const addColCard = document.createElement('div');
+    addColCard.className = 'kanban-column add-column-card';
+    addColCard.innerHTML = `
+      <button class="add-column-btn" id="btn-add-column">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <span>Add Column</span>
+      </button>
+    `;
+    addColCard.querySelector('#btn-add-column').addEventListener('click', () => openStageModal(null));
+    boardEl.appendChild(addColCard);
 
     updateStats();
   }
@@ -42,15 +55,26 @@ const KanbanBoard = (() => {
       <div class="column-header">
         <div class="column-header-left">
           <span class="column-dot" style="background: ${stage.color}"></span>
-          <span class="column-name">${stage.name}</span>
+          <span class="column-name">${escapeHtml(stage.name)}</span>
           <span class="column-count" data-count="${stage.id}">${deals.length}</span>
         </div>
+        <button class="column-edit-btn" title="Edit column name & color" data-stage-id="${stage.id}">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.5"/><circle cx="6" cy="12" r="1.5"/><circle cx="18" cy="12" r="1.5"/></svg>
+        </button>
       </div>
       <div class="column-value" data-value="${stage.id}">${CRMStore.formatCurrency(totalValue)}</div>
       <div class="column-cards" data-stage="${stage.id}">
         ${deals.length === 0 ? '<div class="column-empty">No deals yet</div>' : ''}
       </div>
     `;
+
+    const editBtn = col.querySelector('.column-edit-btn');
+    if (editBtn) {
+      editBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openStageModal(stage.id);
+      });
+    }
 
     const cardsContainer = col.querySelector('.column-cards');
 
@@ -248,6 +272,129 @@ const KanbanBoard = (() => {
     CRMStore.on('deals:changed', () => {
       render();
     });
+    CRMStore.on('stages:changed', () => {
+      render();
+    });
+  }
+
+  // ── Stage Column Edit / Add Modal ──
+  function openStageModal(stageId) {
+    const backdropEl = document.getElementById('modal-backdrop');
+    if (!backdropEl) return;
+
+    const stages = CRMStore.getStages();
+    const stage = stageId ? stages.find(s => s.id === stageId) : null;
+    const isEdit = !!stage;
+
+    const presetColors = [
+      '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b',
+      '#10b981', '#ef4444', '#3b82f6', '#06b6d4',
+      '#14b8a6', '#a855f7', '#f97316', '#64748b'
+    ];
+
+    let selectedColor = stage ? stage.color : '#6366f1';
+
+    const panel = backdropEl.querySelector('.modal-panel');
+    panel.innerHTML = `
+      <div class="modal-header">
+        <h3 class="modal-title">${isEdit ? 'Edit Stage Column' : 'Add Stage Column'}</h3>
+        <button class="modal-close" id="modal-close-btn" aria-label="Close modal">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <form id="stage-edit-form" class="modal-form">
+        <div class="form-group">
+          <label class="form-label" for="stage-name-input">Column Name</label>
+          <input class="form-input" type="text" id="stage-name-input" value="${stage ? escapeHtml(stage.name) : ''}" placeholder="e.g. Lead, In Discovery, Contract Sent" required autofocus>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Column Color Dot</label>
+          <div class="color-palette">
+            ${presetColors.map(c => `
+              <button type="button" class="color-swatch ${c.toLowerCase() === selectedColor.toLowerCase() ? 'active' : ''}" data-color="${c}" style="background: ${c};"></button>
+            `).join('')}
+            <div class="custom-color-wrapper" title="Custom color picker">
+              <input type="color" id="stage-custom-color" class="color-input-picker" value="${selectedColor}">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="justify-content: ${isEdit ? 'space-between' : 'flex-end'};">
+          ${isEdit ? `
+            <button type="button" class="btn btn-danger" id="stage-delete-btn">
+              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              <span>Delete Column</span>
+            </button>
+          ` : ''}
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-ghost" id="stage-cancel-btn">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Column</button>
+          </div>
+        </div>
+      </form>
+    `;
+
+    backdropEl.classList.add('open');
+
+    // Close buttons
+    panel.querySelector('#modal-close-btn').addEventListener('click', () => backdropEl.classList.remove('open'));
+    panel.querySelector('#stage-cancel-btn').addEventListener('click', () => backdropEl.classList.remove('open'));
+
+    // Color Swatches Selection
+    const swatches = panel.querySelectorAll('.color-swatch');
+    const customColorInput = panel.querySelector('#stage-custom-color');
+
+    swatches.forEach(swatch => {
+      swatch.addEventListener('click', () => {
+        swatches.forEach(s => s.classList.remove('active'));
+        swatch.classList.add('active');
+        selectedColor = swatch.dataset.color;
+        customColorInput.value = selectedColor;
+      });
+    });
+
+    customColorInput.addEventListener('input', (e) => {
+      swatches.forEach(s => s.classList.remove('active'));
+      selectedColor = e.target.value;
+    });
+
+    // Form submit
+    panel.querySelector('#stage-edit-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = panel.querySelector('#stage-name-input').value.trim();
+      if (!name) return;
+
+      if (isEdit) {
+        CRMStore.updateStage(stageId, { name, color: selectedColor });
+        showToast(`Updated column "${name}"`, 'success');
+      } else {
+        CRMStore.addStage(name, selectedColor);
+        showToast(`Added column "${name}"`, 'success');
+      }
+
+      backdropEl.classList.remove('open');
+      render();
+    });
+
+    // Delete stage
+    if (isEdit) {
+      const deleteBtn = panel.querySelector('#stage-delete-btn');
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', () => {
+          if (confirm(`Are you sure you want to delete the "${stage.name}" column? Any deals in this column will be moved to the first active column.`)) {
+            try {
+              CRMStore.deleteStage(stageId);
+              showToast(`Deleted column "${stage.name}"`, 'info');
+              backdropEl.classList.remove('open');
+              render();
+            } catch (err) {
+              alert(err.message);
+            }
+          }
+        });
+      }
+    }
   }
 
   // ── Helpers ──

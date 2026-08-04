@@ -7,7 +7,7 @@ const CRMStore = (() => {
   const THEME_KEY = 'crm_kanban_theme';
   const SIDEBAR_KEY = 'crm_kanban_sidebar';
 
-  const STAGES = [
+  const DEFAULT_STAGES = [
     { id: 'lead',        name: 'Lead',         color: '#6366f1' },
     { id: 'qualified',   name: 'Qualified',    color: '#8b5cf6' },
     { id: 'proposal',    name: 'Proposal',     color: '#ec4899' },
@@ -15,6 +15,73 @@ const CRMStore = (() => {
     { id: 'won',         name: 'Closed Won',   color: '#10b981' },
     { id: 'lost',        name: 'Closed Lost',  color: '#ef4444' },
   ];
+
+  function getStageStorageKey() {
+    const user = typeof CRMAuth !== 'undefined' && CRMAuth.getUser ? CRMAuth.getUser() : null;
+    return user ? `crm_kanban_stages_${user.id}` : 'crm_kanban_stages_guest';
+  }
+
+  function getStages() {
+    try {
+      const stored = localStorage.getItem(getStageStorageKey());
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.warn('Error loading custom stages:', e);
+    }
+    return DEFAULT_STAGES;
+  }
+
+  function saveStages(stagesList) {
+    try {
+      localStorage.setItem(getStageStorageKey(), JSON.stringify(stagesList));
+      emit('stages:changed', stagesList);
+    } catch (e) {
+      console.error('Error saving stages:', e);
+    }
+  }
+
+  function addStage(name, color) {
+    const stages = getStages();
+    const newStage = {
+      id: 'stage_' + Date.now(),
+      name: name.trim(),
+      color: color || '#6366f1'
+    };
+    stages.push(newStage);
+    saveStages(stages);
+    return newStage;
+  }
+
+  function updateStage(stageId, { name, color }) {
+    const stages = getStages();
+    const idx = stages.findIndex(s => s.id === stageId);
+    if (idx !== -1) {
+      if (name !== undefined) stages[idx].name = name.trim();
+      if (color !== undefined) stages[idx].color = color;
+      saveStages(stages);
+    }
+  }
+
+  function deleteStage(stageId) {
+    let stages = getStages();
+    if (stages.length <= 1) {
+      throw new Error('You must keep at least one stage column.');
+    }
+    const remainingStages = stages.filter(s => s.id !== stageId);
+    const fallbackStageId = remainingStages[0].id;
+
+    // Move any deals in deleted stage to fallback stage
+    deals.forEach(deal => {
+      if (deal.stage === stageId) {
+        moveDeal(deal.id, fallbackStageId);
+      }
+    });
+
+    saveStages(remainingStages);
+  }
 
   const PRIORITIES = ['low', 'medium', 'high', 'urgent'];
 
@@ -440,7 +507,11 @@ const CRMStore = (() => {
 
   // ── Public API ──
   return {
-    STAGES,
+    get STAGES() { return getStages(); },
+    getStages,
+    addStage,
+    updateStage,
+    deleteStage,
     PRIORITIES,
     on,
     fetchDeals,
