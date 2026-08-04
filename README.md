@@ -97,7 +97,14 @@ create policy "Users can update their own deals" on deals for update using (auth
 create policy "Users can delete their own deals" on deals for delete using (auth.uid() = user_id);
 ```
 
-4. *(Optional)* To allow instant login during testing without verifying email, go to **Authentication** → **Settings** → disable **Confirm email**.
+4. *(Optional)* **Enable Google One-Click Login**:
+   - Go to Supabase Dashboard → **Authentication** → **Providers** → **Google**.
+   - Toggle **Enable Google provider**.
+   - Obtain your **Client ID** & **Client Secret** from [Google Cloud Console](https://console.cloud.google.com/) (APIs & Services → Credentials → OAuth 2.0 Client IDs).
+   - Set Authorized Redirect URI in Google Cloud Console to: `https://<your-supabase-id>.supabase.co/auth/v1/callback`
+   - Save changes. Users can now click **Continue with Google** on the login screen!
+
+5. *(Optional)* To allow instant email signup during testing without email verification, go to **Authentication** → **Settings** → disable **Confirm email**.
 
 ---
 
