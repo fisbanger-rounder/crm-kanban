@@ -1573,15 +1573,24 @@ input, select, textarea {
   stroke-linejoin: round;
 }
 
-/* Hide user details when sidebar collapsed */
-.sidebar.collapsed .user-details {
-  opacity: 0;
-  pointer-events: none;
+/* Hide user details & logout button when sidebar collapsed */
+.sidebar.collapsed .user-details,
+.sidebar.collapsed .user-logout-btn {
+  display: none !important;
 }
 
-.sidebar.collapsed .user-logout-btn {
-  opacity: 0;
-  pointer-events: none;
+.sidebar.collapsed #user-profile {
+  justify-content: center;
+  padding: 4px 0;
+}
+
+.sidebar.collapsed .user-profile-info {
+  justify-content: center;
+  flex: none;
+}
+
+.sidebar.collapsed .sidebar-footer {
+  padding: 12px 8px;
 }
 
 /* ═══════════════════════════════════════════════════════
