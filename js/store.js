@@ -324,7 +324,7 @@ const CRMStore = (() => {
     const totalDeals = deals.length;
     const totalValue = deals.reduce((sum, d) => sum + d.value, 0);
     const stageStats = {};
-    STAGES.forEach(s => {
+    getStages().forEach(s => {
       const stageDeals = deals.filter(d => d.stage === s.id);
       stageStats[s.id] = {
         count: stageDeals.length,
