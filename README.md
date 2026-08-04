@@ -101,6 +101,29 @@ create policy "Users can delete their own deals" on deals for delete using (auth
 
 ---
 
+## 🔺 Vercel Deployment
+
+Deploying to Vercel requires **zero build configuration** since this app is built with static HTML, CSS, and JS.
+
+### Method 1: Via Vercel Web Dashboard (Recommended)
+
+1. Go to **[vercel.com/new](https://vercel.com/new)**.
+2. Select **Import Git Repository** and choose `fisbanger-rounder/crm-kanban`.
+3. Configure Project:
+   - **Framework Preset**: Select **"Other"**
+   - **Build Command**: Leave empty
+   - **Output Directory**: Leave empty (`./`)
+4. Click **Deploy**. Vercel will give you a live HTTPS URL (e.g. `https://crm-kanban.vercel.app`).
+
+### Method 2: Via Vercel CLI
+
+```bash
+npm i -g vercel
+vercel
+```
+
+---
+
 ## 🐳 Docker Deployment
 
 ### Using Docker Compose (Recommended)
