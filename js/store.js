@@ -76,8 +76,20 @@ const CRMStore = (() => {
     const client = window.supabaseClient || (typeof CRMAuth !== 'undefined' && CRMAuth.getUser ? window.supabase?.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey) : null);
     const user = CRMAuth ? CRMAuth.getUser() : null;
 
+    const seedKey = user ? `crm_seeded_${user.id}` : 'crm_seeded_local';
+    const isSeeded = localStorage.getItem(seedKey) === 'true';
+
     if (!user || !client) {
-      deals = loadLocalDeals() || generateSeedData();
+      const local = loadLocalDeals();
+      if (local !== null) {
+        deals = local;
+      } else if (!isSeeded) {
+        deals = generateSeedData();
+        localStorage.setItem(seedKey, 'true');
+      } else {
+        deals = [];
+      }
+      saveLocalDeals(deals);
       emit('deals:changed');
       return deals;
     }
@@ -91,11 +103,13 @@ const CRMStore = (() => {
       if (error) {
         console.warn('Supabase fetch error (table missing or RLS issue). Falling back to local storage:', error.message);
         isSupabaseConnected = false;
-        deals = loadLocalDeals() || generateSeedData();
+        const local = loadLocalDeals();
+        deals = local !== null ? local : (!isSeeded ? generateSeedData() : []);
       } else {
         isSupabaseConnected = true;
-        if (data.length === 0) {
+        if (data.length === 0 && !isSeeded) {
           // First time for this user: Seed demo data into Supabase
+          localStorage.setItem(seedKey, 'true');
           const seedData = generateSeedData();
           const seedRows = seedData.map(d => mapDealToDb(d, user.id));
           const { data: insertedData, error: seedError } = await client
@@ -109,13 +123,16 @@ const CRMStore = (() => {
             deals = seedData;
           }
         } else {
+          // Mark user as seeded so deleting all deals won't trigger re-seeding
+          localStorage.setItem(seedKey, 'true');
           deals = data.map(mapDbToDeal);
         }
       }
     } catch (err) {
       console.warn('Database error:', err);
       isSupabaseConnected = false;
-      deals = loadLocalDeals() || generateSeedData();
+      const local = loadLocalDeals();
+      deals = local !== null ? local : (!isSeeded ? generateSeedData() : []);
     }
 
     saveLocalDeals(deals);
