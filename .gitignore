@@ -1,0 +1,42 @@
+# ═══════════════════════════════════════════════════════
+# CRM Kanban — Git Ignore
+# ═══════════════════════════════════════════════════════
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment / Secret Credentials
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE & Code Editor Files
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary & Build artifacts
+dist/
+build/
+tmp/
+*.tmp
