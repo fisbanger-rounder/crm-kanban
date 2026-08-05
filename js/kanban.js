@@ -303,19 +303,21 @@ const KanbanBoard = (() => {
         </button>
       </div>
       <form id="stage-edit-form" class="modal-form">
-        <div class="form-group">
-          <label class="form-label" for="stage-name-input">Column Name</label>
-          <input class="form-input" type="text" id="stage-name-input" value="${stage ? escapeHtml(stage.name) : ''}" placeholder="e.g. Lead, In Discovery, Contract Sent" required autofocus>
-        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="stage-name-input">Column Name</label>
+            <input class="form-input" type="text" id="stage-name-input" value="${stage ? escapeHtml(stage.name) : ''}" placeholder="e.g. Lead, In Discovery, Contract Sent" required autofocus>
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Column Color Dot</label>
-          <div class="color-palette">
-            ${presetColors.map(c => `
-              <button type="button" class="color-swatch ${c.toLowerCase() === selectedColor.toLowerCase() ? 'active' : ''}" data-color="${c}" style="background: ${c};"></button>
-            `).join('')}
-            <div class="custom-color-wrapper" title="Custom color picker">
-              <input type="color" id="stage-custom-color" class="color-input-picker" value="${selectedColor}">
+          <div class="form-group">
+            <label class="form-label">Column Color Dot</label>
+            <div class="color-palette">
+              ${presetColors.map(c => `
+                <button type="button" class="color-swatch ${c.toLowerCase() === selectedColor.toLowerCase() ? 'active' : ''}" data-color="${c}" style="background: ${c};"></button>
+              `).join('')}
+              <div class="custom-color-wrapper" title="Custom color picker">
+                <input type="color" id="stage-custom-color" class="color-input-picker" value="${selectedColor}">
+              </div>
             </div>
           </div>
         </div>
@@ -333,6 +335,7 @@ const KanbanBoard = (() => {
           </div>
         </div>
       </form>
+
     `;
 
     backdropEl.classList.add('open');
