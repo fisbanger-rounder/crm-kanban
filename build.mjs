@@ -4,11 +4,39 @@
  *
  * This script is used during Docker multi-stage builds and Vercel deployments
  * to obfuscate the source code before it is served to end users.
+ *
+ * Credential Injection:
+ *   If the environment variables SUPABASE_URL and SUPABASE_ANON_KEY are set,
+ *   this script generates js/config.js from them at build time.
+ *   This means credentials are never stored in git — only in Vercel env vars.
+ *
+ *   To set up in Vercel:
+ *     1. Go to Vercel → Project → Settings → Environment Variables
+ *     2. Add: SUPABASE_URL = https://xxxx.supabase.co
+ *     3. Add: SUPABASE_ANON_KEY = your-anon-key
  */
 
 import { minify } from 'terser';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 
+// ── Step 1: Inject credentials from env vars (if available) ──────────────────
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+
+if (supabaseUrl && supabaseAnonKey) {
+  const configSource = `const SUPABASE_CONFIG = { url: "${supabaseUrl}", anonKey: "${supabaseAnonKey}" };`;
+  writeFileSync('js/config.js', configSource, 'utf8');
+  console.log('✓  js/config.js generated from environment variables.\n');
+} else if (!existsSync('js/config.js')) {
+  console.error('✗  js/config.js not found and no SUPABASE_URL / SUPABASE_ANON_KEY env vars set.');
+  console.error('   → For local dev: copy js/config.example.js to js/config.js and fill in your credentials.');
+  console.error('   → For Vercel: set SUPABASE_URL and SUPABASE_ANON_KEY in Vercel environment variables.\n');
+  process.exit(1);
+} else {
+  console.log('ℹ  Using existing js/config.js (local dev mode — env vars not set).\n');
+}
+
+// ── Step 2: Minify all JS files ───────────────────────────────────────────────
 const JS_FILES = [
   'js/analytics.js',
   'js/app.js',

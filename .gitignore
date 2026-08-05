@@ -6,6 +6,10 @@
 node_modules/
 package-lock.json
 
+# Supabase Credentials (use env vars in production, config.example.js as template)
+js/config.js
+
+
 # Environment / Secret Credentials
 .env
 .env.local

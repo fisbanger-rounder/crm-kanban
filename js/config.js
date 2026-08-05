@@ -1,1 +1,0 @@
-const SUPABASE_CONFIG={url:"https://eeyfrkqlwcrqsgotaijm.supabase.co",anonKey:"sb_publishable_vydncp3Qc0Bz-Gqqr_zOlw_OAu0MRXv"};

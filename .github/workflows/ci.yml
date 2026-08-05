@@ -1,0 +1,37 @@
+name: CI — Build & Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build & Minify
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --include=dev
+
+      - name: Run build (minify JS)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: node build.mjs
+
+      - name: Validate output files exist
+        run: |
+          for f in js/analytics.js js/app.js js/auth.js js/config.js js/contacts.js js/kanban.js js/modal.js js/settings.js js/store.js; do
+            [ -f "$f" ] && echo "✓ $f" || (echo "✗ MISSING: $f" && exit 1)
+          done
