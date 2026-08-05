@@ -926,7 +926,7 @@ input, select, textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 36px 16px;
+  padding: 20px 52px 16px;
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -965,7 +965,7 @@ input, select, textarea {
 .modal-body {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 36px;
+  padding: 20px 52px;
 }
 
 .form-grid {
@@ -1049,7 +1049,7 @@ input, select, textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 36px 20px;
+  padding: 16px 52px 20px;
   border-top: 1px solid var(--border-subtle);
   gap: 12px;
 }
