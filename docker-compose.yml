@@ -1,4 +1,4 @@
-version: '3.8'
+# version: '3.8'
 
 services:
   crm-kanban:
@@ -8,4 +8,4 @@ services:
     container_name: crm-kanban-app
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "8800:80"

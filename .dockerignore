@@ -3,7 +3,6 @@
 .dockerignore
 Dockerfile
 docker-compose.yml
-nginx.conf
 node_modules
 *.md
 supabase_schema.sql
